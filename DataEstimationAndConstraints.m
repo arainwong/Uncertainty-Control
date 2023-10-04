@@ -23,7 +23,7 @@ disp('----------------------------------------------------------------------');
 
 angleSensor = false;
 frictionSensor = false;
-weightSensor = true;
+weightSensor = true; 
 % gSensor = true;   % it is easy and cheap to measure so that it would not be
                     % considered anymore
 
@@ -31,10 +31,32 @@ velocitySensor = false;
 
 %% Constraints
 
-time_lb = 3; % s
-time_ub = 5; % s
+% length = 0.23
+
+time_lb = 0.1; % s
+time_ub = 0.3; % s
+
+% velocity and time constraints mode
+vtMode = false;
+
 velocity_lb = 1.5; % m/s
 velocity_ub = 1.5; % m/s 
+
+% acceleration constraints mode
+accMode = true;
+
+if vtMode == true && accMode == false
+    con_lb = velocity_lb / time_ub;
+    con_ub = velocity_ub / time_lb;
+    
+elseif vtMode == false && accMode == true
+    con_lb = 2*length/(time_ub^2);
+    con_ub = 2*length/(time_lb^2);
+
+else
+    error('Please choose a correct constaint mode')
+end
+disp(['The desired acceleration constraint is : [', num2str(con_lb), ', ', num2str(con_ub), '].']);
 
 %% Estimation based on sampled data
 
@@ -88,8 +110,8 @@ if find(optimizationType==true) == 1
     k_ub = estFriction_ub / estWeight_lb;
     
     u_lbSet = [0, ...
-               (velocity_lb / time_ub - estAcc_ub) /k_ub];
-    u_ubSet = [(velocity_ub / time_lb - estAcc_lb) /k_lb, ...
+               (con_lb - estAcc_ub) /k_ub];
+    u_ubSet = [(con_ub - estAcc_lb) /k_lb, ...
                 estWeight_lb * estG * cos(estAngle_ub)];
     u_lb = max(u_lbSet);
     u_ub = min(u_ubSet);
@@ -97,7 +119,10 @@ if find(optimizationType==true) == 1
     
     u = u_ub;
     
-elseif find(optimizationType==true) == 2
+elseif find(optimizationType==true) == 2 
+    if weightSensor ~= true
+        error('Weight sensor is required in case 2');
+    end
     u = zeros(1, numSample);
     validationSet = zeros(1, numSample);
     for i = 1:numSample
@@ -106,8 +131,8 @@ elseif find(optimizationType==true) == 2
 
         validationSet(i) = estWeight(i) * estG * cos(estAngle_lb);
 
-        u_lb = (velocity_lb / time_ub - estAcc_ub) /k_ub;
-        u_ub = (velocity_ub / time_lb - estAcc_lb) /k_lb;
+        u_lb = (con_lb - estAcc_ub) /k_ub;
+        u_ub = (con_ub - estAcc_lb) /k_lb;
         if validationSet(i) <= u_ub
             u(i) = validationSet(i);
         else
