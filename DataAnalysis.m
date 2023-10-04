@@ -65,10 +65,18 @@ for i = 1:numSample
 end
 
 %% Visualization
+nbins = 20;
+
 subplot(3,2,1)
 plot(t(1:max(indexForFinalVelocity)), x(1:max(indexForFinalVelocity),:));
 title('distance x');
 xlabel('t'); ylabel('x');
+
+subplot(3,2,2)
+scatter(endTime, dot_x(max(indexForFinalVelocity), :));
+title('velocity v');
+xlabel('t'); ylabel('v');
+
 
 subplot(3,2,3)
 plot(t(1:max(indexForFinalVelocity)), dot_x(1:max(indexForFinalVelocity),:));
@@ -76,14 +84,19 @@ title('velocity v');
 xlabel('t'); ylabel('v');
 
 subplot(3,2,4)
-scatter(endTime, dot_x(max(indexForFinalVelocity), :));
+histogram(removeZero(ddot_x(max(indexForFinalVelocity),:)), nbins);
 title('velocity v');
-xlabel('t'); ylabel('v');
+xlabel('v'); ylabel('the number of samples');
 
 subplot(3,2,5)
 plot(t(1:max(indexForFinalVelocity)), ddot_x(1:max(indexForFinalVelocity),:));
 title('acceleration a');
 xlabel('t'); ylabel('a');
+
+subplot(3,2,6)
+histogram(removeZero(ddot_x(max(indexForFinalVelocity),:)), nbins);
+title('acceleration a');
+xlabel('a'); ylabel('number of samples');
 
 % velocity
 maxVelocity = max(max(dot_x));
