@@ -30,7 +30,8 @@ ddot_x = zeros(step, numSample);
 % definition of "fail": can not 
 numFailed = sum(x(end, :)<length);
 if numFailed > 0
-    disp(['ATTENTION: ', num2str(numFailed), '/', num2str(numSample), ' samples are failed.']);
+    disp(['ATTENTION: ', num2str(numFailed), '/', num2str(numSample), ...
+        ' samples are failed.']);
     disp('The possible reason could be excessive friction or a longer required time.');
     disp('----------------------------------------------------------------------');
 else
@@ -39,35 +40,47 @@ else
 end
 
 %% Fix the relation between distance and velocity
-% e.g. 
+
 indexForFinalVelocity = zeros(1, numSample);
+% find the specific time when the workpiece reach the end
+endTime = zeros(1, numSample); 
 
 % fix the data -> consider the phsical limit
 for i = 1:numSample
+    % find the index when the workpiece reached the end
     temp = find(x_out(:, i)>=length, 1 );
     ddot_x(:, i) = ddot_x_out(i);
-    if temp ~= 0
+    if temp ~= 0 
         indexForFinalVelocity(i) = temp;
         x(indexForFinalVelocity(i):end, i) = length;
         dot_x(indexForFinalVelocity(i):end, i) = dot_x_out(indexForFinalVelocity(i), i);
-    else
+        endTime(i) = t(indexForFinalVelocity(i));
+    else % workpiece does not move or has not reach the end yet
         indexForFinalVelocity(i) = -1;
         x(:, i) = 0;
         dot_x(:, i) = 0;
         ddot_x(:, i) = 0;
+        endTime(i) = 0;
     end
 end
 
 %% Visualization
-subplot(3,1,1)
+subplot(3,2,1)
 plot(t(1:max(indexForFinalVelocity)), x(1:max(indexForFinalVelocity),:));
 title('distance x');
 xlabel('t'); ylabel('x');
-subplot(3,1,2)
+
+subplot(3,2,3)
 plot(t(1:max(indexForFinalVelocity)), dot_x(1:max(indexForFinalVelocity),:));
 title('velocity v');
 xlabel('t'); ylabel('v');
-subplot(3,1,3)
+
+subplot(3,2,4)
+scatter(endTime, dot_x(max(indexForFinalVelocity), :));
+title('velocity v');
+xlabel('t'); ylabel('v');
+
+subplot(3,2,5)
 plot(t(1:max(indexForFinalVelocity)), ddot_x(1:max(indexForFinalVelocity),:));
 title('acceleration a');
 xlabel('t'); ylabel('a');
@@ -83,14 +96,17 @@ minAcc = min(ddot_x(end, minVelocityIndex));
 
 % min/max value analysis
 disp(['In the ', num2str(numSample - numFailed), ' successful samples: '])
-% velocitygu
-disp(['The maximum velocity is ', num2str(maxVelocity), ' m/s.']);
-disp(['The minimum velocity is ', num2str(minVelocity), ' m/s, it takes ', ...
+
+% velocity
+disp(['The velocity range of the samples is : [', ...
+    num2str(minVelocity), ', ', num2str(maxVelocity), '] m/s,']);
+disp(['             the slowest takes ', ...
     num2str(t(max(indexForFinalVelocity))), 's to reach the end.']);
+
 % acceleration
-disp(['The maximum acceleration is ', num2str(maxAcc), ' m^2/s.']);
-disp(['The minimum acceleration is ', num2str(minAcc), ' m^2/s.']);
+disp(['The acceleration range of the samples is : [', ...
+    num2str(minAcc), ', ', num2str(maxAcc), '] m/s.']);
 disp('----------------------------------------------------------------------');
 
-
+ 
 toc;
