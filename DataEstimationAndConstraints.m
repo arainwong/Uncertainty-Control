@@ -2,10 +2,10 @@ close all;
 
 %% Optimization Type
 
-% 1 -> robust control
-% 2 -> stochastic control
-% 3 -> unknown control
-optimizationType = [false, true, false];
+% 1 -> Case 1
+% 2 -> Case 2
+% 3 -> Case 3
+optimizationType = [false, false, true];
 
 disp('----------------------------------------------------------------------');
 if find(optimizationType==true) == 1
@@ -13,7 +13,7 @@ if find(optimizationType==true) == 1
 elseif find(optimizationType==true) == 2
     disp('Case 2');
 elseif find(optimizationType==true) == 3
-    disp('Unknown Control');
+    disp('Case 3');
 else
     error('Wrong configuration in control type');
 end
@@ -32,18 +32,17 @@ velocitySensor = false;
 %% Constraints
 
 % length = 0.23
-
-time_lb = 0.1; % s
-time_ub = 0.3; % s
+time_lb = 3; % s
+time_ub = 5; % s
 
 % velocity and time constraints mode
-vtMode = false;
+vtMode = true;
 
 velocity_lb = 1.5; % m/s
 velocity_ub = 1.5; % m/s 
 
 % acceleration constraints mode
-accMode = true;
+accMode = false;
 
 if vtMode == true && accMode == false
     con_lb = velocity_lb / time_ub;
@@ -103,19 +102,22 @@ estG = g;
 % disp(['The estimated g: [', num2str(estG_lb), ', ', num2str(estG_up), '] m/s^2.']);
 disp(['The estimated g: ', num2str(estG), ' m/s^2.']);
 
+
 %% Control Input
 
 if find(optimizationType==true) == 1
     k_lb = estFriction_lb / estWeight_ub;
     k_ub = estFriction_ub / estWeight_lb;
     
-    u_lbSet = [0, ...
-               (con_lb - estAcc_ub) /k_ub];
+%     u_lbSet = [0, ...
+%                (con_lb - estAcc_ub) /k_ub];
     u_ubSet = [(con_ub - estAcc_lb) /k_lb, ...
                 estWeight_lb * estG * cos(estAngle_ub)];
-    u_lb = max(u_lbSet);
+%     u_lb = max(u_lbSet);
+    u_lb = (con_lb - estAcc_ub) /k_ub;
     u_ub = min(u_ubSet);
-    disp(['The control input set: [', num2str(u_lb), ', ', num2str(u_ub), '] m*kg/s^2.']);
+    disp(['The control input set: [', num2str(u_lb), ', ', num2str(u_ub), ...
+        '] m*kg/s^2.']);
     
     u = u_ub;
     
@@ -140,5 +142,13 @@ elseif find(optimizationType==true) == 2
         end
     end
 
+elseif find(optimizationType==true) == 3
+    % set the reference velocity
+    t_des = 4; % s
+    dot_x_des = 2*length/t_des;
+    disp(['The reference velocity is ', num2str(dot_x_des), ' m/s.']);
+    
+
     
 end
+disp('----------------------------------------------------------------------');
