@@ -9,10 +9,9 @@ Semester Thesis
     - DataEstimationAndConstraints.m    -> derive control input
     - model.slx                         -> rerun model
     - DataAnalysis.m                    -> refine and visulize data 
+
 - Case 3 (feedback form control)
     - DataSampling.m                    -> config parameters 
-    - FBmodel.slx                       -> run model
-    - DataAnalysis.m                    -> refine and visulize data 
     - DataEstimationAndConstraints.m    -> set reference parameter
-    - model.slx                         -> rerun model
-    - DataAnalysis.m                    -> refine and visulize data 
+    - FBmodel.slx                         -> rerun model
+    - FBDataAnalysis.m                    -> refine and visulize data 
