@@ -4,10 +4,11 @@ close all;
 
 % 1 -> Case 1, require no sensor
 % 2 -> Case 2, require weight sensor, g sensor used as default
-% 3 -> Case 3, have its own control goal based on reference parameter
-% 4 -> Case 4, case 2 + case 3 == Feedforward + Feedback
-% 5 -> Case 5, require angle and weight sensors, g sensor used as default
-% 6 -> Case 6, require angle, weight and friction sensors, g sensor used as default
+% 3 -> Case 3, require angle and weight sensors, g sensor used as default
+% 4 -> Case 4, require angle, weight and friction sensors, g sensor used as default
+% 5 -> Case 5, feedback control, have its own control goal based on reference parameter
+% 6 -> Case 6, case 2 + case 3 == Feedforward + Feedback
+
 
 optimizationType = [false, false, false, false, false, false];
 optimizationType(6) = true;
@@ -20,7 +21,14 @@ elseif find(optimizationType==true) == 2
     disp('Case 2, require weight sensor, g sensor used as default.');
 
 elseif find(optimizationType==true) == 3
-    disp('Case 3, purely feedback control.');
+    disp('Case 3, require angle and weight sensors, g sensor used as default.');
+
+elseif find(optimizationType==true) == 4
+    disp('Case 4, require angle, weight and friction sensors, g sensor used as default.');
+
+
+elseif find(optimizationType==true) == 5
+    disp('Case 5, purely feedback control.');
 
     % set the reference velocity, since feedback form control does not 
     % require any estimation and constraint
@@ -31,14 +39,9 @@ elseif find(optimizationType==true) == 3
     disp('----------------------------------------------------------------------');
     return
 
-elseif find(optimizationType==true) == 4
-    disp('Case 4, feedforward and feedback control.');
-
-elseif find(optimizationType==true) == 5
-    disp('Case 5, require angle and weight sensors, g sensor used as default.');
-
 elseif find(optimizationType==true) == 6
-    disp('Case 6, require angle, weight and friction sensors, g sensor used as default.');
+    disp('Case 6, feedforward and feedback control.');
+
 
 else
     error('Wrong configuration in control type');
@@ -192,7 +195,7 @@ elseif find(optimizationType==true) == 2
     end
     disp('Case 2, the control sequence based on weight sensor has been derived.');
 
-elseif find(optimizationType==true) == 5
+elseif find(optimizationType==true) == 3
     if angleSensor == false || weightSensor  == false
         error('Angle and weight sensors are required in case 5');
     end
@@ -215,9 +218,9 @@ elseif find(optimizationType==true) == 5
         u(i) = min([validationSet(i), u_ub]);
 
     end
-    disp('Case 5, the control sequence based on angle and weight sensor has been derived.')
+    disp('Case 3, the control sequence based on angle and weight sensor has been derived.')
     
-elseif find(optimizationType==true) == 6
+elseif find(optimizationType==true) == 4
     if angleSensor == false || weightSensor  == false || frictionSensor == false
         error('Angle, weight and friction sensors are required in case 6');
     end
@@ -233,7 +236,7 @@ elseif find(optimizationType==true) == 6
         u(i) = min([validationSet(i), (con_lb - estAcc) / k]);
 
     end
-    disp('Case 6, the control sequence based on angle, weight and friction sensor has been derived.')
+    disp('Case 4, the control sequence based on angle, weight and friction sensor has been derived.')
     
 
 end
