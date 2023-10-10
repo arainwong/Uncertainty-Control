@@ -11,8 +11,8 @@ close all;
 
 % Prepare for "Live Script" representation, here the redundency design is just
 % used for easy modification
-optimizationType = [false, false, false, false, false, false];
-optimizationType(4) = true;
+optimizationType = [false, false, false, false, false, false, false];
+optimizationType(1) = true;
 
 disp('----------------------------------------------------------------------');
 % config the sensors
@@ -77,6 +77,17 @@ elseif find(optimizationType==true) == 6
     disp('----------------------------------------------------------------------');
     return
 
+elseif find(optimizationType==true) == 7
+    disp(['Case 7, the strategy is minimum energy consumption, which ', ...
+        'require angle and weight sensors, g sensor used as default.']);
+    
+    angleSensor = true;
+    weightSensor = true; 
+    % gSensor = true;   % it is easy and cheap to measure so that it would not be
+                        % considered anymore
+    
+    frictionSensor = false;
+
 else
     error('Wrong configuration in control type');
 end
@@ -98,8 +109,8 @@ disp('----------------------------------------------------------------------');
 disp('Constraints: ');
 
 % length = 0.23
-time_lb = 0.5; % s
-time_ub = 0.5; % s
+time_lb = 0.2; % s
+time_ub = 0.3; % s
 
 % velocity and time constraints mode
 vtMode = false;
@@ -197,17 +208,22 @@ if find(optimizationType==true) == 1
     k_lb = estFriction_lb / estWeight_ub;
     k_ub = estFriction_ub / estWeight_lb;
     
-%     u_lbSet = [0, ...
-%                (con_lb - estAcc_ub) /k_ub];
-    u_ubSet = [(con_ub - estAcc_lb) /k_lb, ...
-                estWeight_lb * estG * cos(estAngle_ub)];
-%     u_lb = max(u_lbSet);
+    validationSet = estWeight_lb * estG * cos(estAngle_ub);
+%     validationSet = 999;
+    
     u_lb = (con_lb - estAcc_ub) /k_ub;
-    u_ub = min(u_ubSet);
+    u_ub = min([validationSet, (con_ub - estAcc_lb) /k_lb]);
+
+    u = u_ub;
+
     disp(['The control input set: [', num2str(u_lb), ', ', num2str(u_ub), ...
         '] m*kg/s^2.']);
     
-    u = u_ub;
+    % validation: how much workpieces being blown away
+    validateSample = g .* weight .* cos(angle) - u;
+    failedSamples = sum(validateSample < 0);
+    disp(['There are ', num2str(failedSamples), '/', num2str(numSample), ...
+        ' samples failed in this case.']);
     
 elseif find(optimizationType==true) == 2 
     if weightSensor ~= true
@@ -218,8 +234,9 @@ elseif find(optimizationType==true) == 2
     for i = 1:numSample
         k_lb = estFriction_lb / estWeight(i);
         k_ub = estFriction_ub / estWeight(i);
-
-        validationSet(i) = estWeight(i) * estG * cos(estAngle_lb);
+        
+        % avoid the workpiece being blown away 
+        validationSet(i) = estWeight(i) * estG * cos(estAngle_ub);
 
         u_lb = (con_lb - estAcc_ub) /k_ub;
         u_ub = (con_ub - estAcc_lb) /k_lb;
@@ -278,8 +295,33 @@ elseif find(optimizationType==true) == 4
     disp(['The control input set: [', num2str(min(u)), ', ', num2str(max(u)), ...
         '] m*kg/s^2.']);
     
-elseif find(optimizationType==true) == 6
+elseif find(optimizationType==true) == 7
+    if angleSensor == false || weightSensor  == false
+        error('Angle and weight sensors are required in case 5');
+    end
+    u = zeros(1, numSample);
+    validationSet = zeros(1, numSample);
+    for i = 1:numSample
+        k_lb = estFriction_lb / estWeight(i);
+        k_ub = estFriction_ub / estWeight(i);
+        
+        estAccSet = [estG * sin(estAngle(i)) - estFriction_lb * estG * cos(estAngle(i)), ...
+                     estG * sin(estAngle(i)) - estFriction_ub * estG * cos(estAngle(i))];
+        estAcc_lb = min(estAccSet);
+        estAcc_ub = max(estAccSet);
+        
+        validationSet(i) = estWeight(i) * estG * cos(estAngle(i));
 
+        u_lb = estAcc_lb /k_ub;
+        u_ub = estAcc_ub /k_lb;
+
+        u(i) = min([validationSet(i), u_ub]);
+
+    end
+    disp(['Case 7, with the minimum energy consumption strategy, ', ...
+        'the control sequence based on angle and weight sensor has been derived.']);
+    disp(['The control input set: [', num2str(min(u)), ', ', num2str(max(u)), ...
+        '] m*kg/s^2.']);
 
 end
 disp('----------------------------------------------------------------------');
