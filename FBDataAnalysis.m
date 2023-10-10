@@ -24,12 +24,12 @@ t = out.tout;
 
 % copy for later which used for data fix
 x = x_out;
-dot_x = dot_x_out;
+dot_x_fb = dot_x_out;
 ddot_x = zeros(step, numSample);
 
 %% Check how many sample failed
 % definition of "fail": can not 
-numFailed = sum(dot_x(end, :)<length);
+numFailed = sum(dot_x_fb(end, :)<length);
 if numFailed > 0
     disp(['ATTENTION: ', num2str(numFailed), '/', num2str(numSample), ...
         ' samples are failed.']);
@@ -54,12 +54,12 @@ for i = 1:numSample
     if temp ~= 0 
         indexForFinalVelocity(i) = temp;
         x(indexForFinalVelocity(i):end, i) = length;
-        dot_x(indexForFinalVelocity(i):end, i) = dot_x_out(indexForFinalVelocity(i), i);
+        dot_x_fb(indexForFinalVelocity(i):end, i) = dot_x_out(indexForFinalVelocity(i), i);
         endTime(i) = t(indexForFinalVelocity(i));
     else % workpiece does not move or has not reach the end yet
         indexForFinalVelocity(i) = -1;
         x(:, i) = 0;
-        dot_x(:, i) = 0;
+        dot_x_fb(:, i) = 0;
         ddot_x(:, i) = 0;
         endTime(i) = 0;
     end
@@ -72,26 +72,25 @@ plotCol = 2;
 numPlot = 1;
 
 subplot(plotRow,plotCol,numPlot)
-plot(t(1:max(indexForFinalVelocity)), x_out(1:max(indexForFinalVelocity),:));
+plot(t(1:max(indexForFinalVelocity)), x(1:max(indexForFinalVelocity),:));
 title('distance x');
 xlabel('t'); ylabel('x');
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
-scatter(endTime, dot_x(max(indexForFinalVelocity), :));
+plot(t(1:max(indexForFinalVelocity)), u(1:max(indexForFinalVelocity),:));
+title('control sequence');
+xlabel('t'); ylabel('u');
+numPlot = numPlot + 1;
+
+subplot(plotRow,plotCol,numPlot)
+plot(t(1:max(indexForFinalVelocity)), dot_x_fb(1:max(indexForFinalVelocity),:));
 title('velocity v');
 xlabel('t'); ylabel('v');
 numPlot = numPlot + 1;
 
-
 subplot(plotRow,plotCol,numPlot)
-plot(t(1:max(indexForFinalVelocity)), dot_x_out(1:max(indexForFinalVelocity),:));
-title('velocity v');
-xlabel('t'); ylabel('v');
-numPlot = numPlot + 1;
-
-subplot(plotRow,plotCol,numPlot)
-histogram(removeZero(dot_x(max(indexForFinalVelocity),:)), nbins);
+histogram(removeZero(dot_x_fb(max(indexForFinalVelocity),:)), nbins);
 title('velocity v');
 xlabel('v'); ylabel('the number of samples');
 numPlot = numPlot + 1;
@@ -113,9 +112,9 @@ xlabel('a'); ylabel('the number of samples');
 numPlot = numPlot + 1;
 
 % velocity
-maxVelocity = max(max(dot_x));
-minVelocityIndex = find(dot_x(end, :)>0);
-minVelocity = min(dot_x(end, minVelocityIndex));
+maxVelocity = max(max(dot_x_fb));
+minVelocityIndex = find(dot_x_fb(end, :)>0);
+minVelocity = min(dot_x_fb(end, minVelocityIndex));
 % acceleration
 maxAcc = max(ddot_x_out);
 minAccIndex = find(ddot_x(end, :)>0);
