@@ -9,22 +9,51 @@ close all;
 % 5 -> Case 5, feedback control, have its own control goal based on reference parameter
 % 6 -> Case 6, case 2 + case 3 == Feedforward + Feedback
 
-
+% Prepare for "Live Script" representation, here the redundency design is just
+% used for easy modification
 optimizationType = [false, false, false, false, false, false];
-optimizationType(6) = true;
+optimizationType(4) = true;
 
 disp('----------------------------------------------------------------------');
+% config the sensors
 if find(optimizationType==true) == 1
     disp('Case 1');
+
+    angleSensor = false;
+    weightSensor = false; 
+    % gSensor = true;   % it is easy and cheap to measure so that it would not be
+                        % considered anymore
+    
+    frictionSensor = false;
 
 elseif find(optimizationType==true) == 2
     disp('Case 2, require weight sensor, g sensor used as default.');
 
+    angleSensor = false;
+    weightSensor = true; 
+    % gSensor = true;   % it is easy and cheap to measure so that it would not be
+                        % considered anymore
+    
+    frictionSensor = false;
 elseif find(optimizationType==true) == 3
     disp('Case 3, require angle and weight sensors, g sensor used as default.');
+    
+    angleSensor = true;
+    weightSensor = true; 
+    % gSensor = true;   % it is easy and cheap to measure so that it would not be
+                        % considered anymore
+    
+    frictionSensor = false;
 
 elseif find(optimizationType==true) == 4
     disp('Case 4, require angle, weight and friction sensors, g sensor used as default.');
+
+    angleSensor = true;
+    weightSensor = true; 
+    % gSensor = true;   % it is easy and cheap to measure so that it would not be
+                        % considered anymore
+    
+    frictionSensor = true;
 
 
 elseif find(optimizationType==true) == 5
@@ -41,7 +70,12 @@ elseif find(optimizationType==true) == 5
 
 elseif find(optimizationType==true) == 6
     disp('Case 6, feedforward and feedback control.');
-
+    PID = [3, 0.5, 0];
+    u_ref = u;
+    dot_x_ref = dot_x(end, :);
+    disp('The reference of control sequence and velocity have been set.');
+    disp('----------------------------------------------------------------------');
+    return
 
 else
     error('Wrong configuration in control type');
@@ -50,22 +84,22 @@ disp('----------------------------------------------------------------------');
 
 %% Sensor Config
 
-angleSensor = true;
-weightSensor = true; 
-% gSensor = true;   % it is easy and cheap to measure so that it would not be
-                    % considered anymore
-
-velocitySensor = false;
-
-frictionSensor = true;
+% angleSensor = true;
+% weightSensor = true; 
+% % gSensor = true;   % it is easy and cheap to measure so that it would not be
+%                     % considered anymore
+% 
+% velocitySensor = false;
+% 
+% frictionSensor = true;
 
 %% Constraints
 
 disp('Constraints: ');
 
 % length = 0.23
-time_lb = 1; % s
-time_ub = 1; % s
+time_lb = 0.5; % s
+time_ub = 0.5; % s
 
 % velocity and time constraints mode
 vtMode = false;
@@ -194,6 +228,8 @@ elseif find(optimizationType==true) == 2
         
     end
     disp('Case 2, the control sequence based on weight sensor has been derived.');
+    disp(['The control input set: [', num2str(min(u)), ', ', num2str(max(u)), ...
+        '] m*kg/s^2.']);
 
 elseif find(optimizationType==true) == 3
     if angleSensor == false || weightSensor  == false
@@ -219,6 +255,8 @@ elseif find(optimizationType==true) == 3
 
     end
     disp('Case 3, the control sequence based on angle and weight sensor has been derived.')
+    disp(['The control input set: [', num2str(min(u)), ', ', num2str(max(u)), ...
+        '] m*kg/s^2.']);
     
 elseif find(optimizationType==true) == 4
     if angleSensor == false || weightSensor  == false || frictionSensor == false
@@ -237,7 +275,11 @@ elseif find(optimizationType==true) == 4
 
     end
     disp('Case 4, the control sequence based on angle, weight and friction sensor has been derived.')
+    disp(['The control input set: [', num2str(min(u)), ', ', num2str(max(u)), ...
+        '] m*kg/s^2.']);
     
+elseif find(optimizationType==true) == 6
+
 
 end
 disp('----------------------------------------------------------------------');
