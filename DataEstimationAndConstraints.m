@@ -8,11 +8,14 @@ close all;
 % 4 -> Case 4, require angle, weight and friction sensors, g sensor used as default
 % 5 -> Case 5, feedback control, have its own control goal based on reference parameter
 % 6 -> Case 6, case 2 + case 3 == Feedforward + Feedback
+% 7 -> Case 7, minimum energy consumption strategy
 
 % Prepare for "Live Script" representation, here the redundency design is just
 % used for easy modification
 optimizationType = [false, false, false, false, false, false, false];
-optimizationType(1) = true;
+optimizationType(7) = true;
+type7Type = [false, false, false, false];
+type7Type(2) = true;
 
 disp('----------------------------------------------------------------------');
 % config the sensors
@@ -81,15 +84,28 @@ elseif find(optimizationType==true) == 7
     disp(['Case 7, the strategy is minimum energy consumption, which ', ...
         'require angle and weight sensors, g sensor used as default.']);
     
-    angleSensor = true;
-    weightSensor = true; 
-    % gSensor = true;   % it is easy and cheap to measure so that it would not be
-                        % considered anymore
+    if find(type7Type==true) == 1
+        angleSensor = false;
+        weightSensor = false; 
+        frictionSensor = false;
+
+    elseif find(type7Type==true) == 2
+        angleSensor = false;
+        weightSensor = true; 
+        frictionSensor = false;
+
+    elseif find(type7Type==true) == 3
+        angleSensor = true;
+        weightSensor = true; 
+        frictionSensor = false;
+
+    end
     
-    frictionSensor = false;
+    Q = 1;
+    R = 1; 
 
 else
-    error('Wrong configuration in control type');
+    error('Wrong configuration in control type.');
 end
 disp('----------------------------------------------------------------------');
 
@@ -296,24 +312,44 @@ elseif find(optimizationType==true) == 4
         '] m*kg/s^2.']);
     
 elseif find(optimizationType==true) == 7
-    if angleSensor == false || weightSensor  == false
-        error('Angle and weight sensors are required in case 5');
-    end
+
     u = zeros(1, numSample);
     validationSet = zeros(1, numSample);
+
+    if find(type7Type==true) == 1 || find(type7Type==true) == 2
+        estAccSet = [estG * (sin(estAngle_ub) - estFriction_ub * cos(estAngle_ub)), ...
+                         estG * (sin(estAngle_lb) - estFriction_ub * cos(estAngle_lb)), ...
+                         estG * (sin(estAngle_ub) - estFriction_lb * cos(estAngle_ub)), ...
+                         estG * (sin(estAngle_lb) - estFriction_lb * cos(estAngle_lb))];
+            estAcc_lb = min(estAccSet);
+            estAcc_ub = max(estAccSet);
+    end
+
     for i = 1:numSample
         k_lb = estFriction_lb / estWeight(i);
         k_ub = estFriction_ub / estWeight(i);
-        
-        estAccSet = [estG * sin(estAngle(i)) - estFriction_lb * estG * cos(estAngle(i)), ...
+            
+        if find(type7Type==true) == 3
+            estAccSet = [estG * sin(estAngle(i)) - estFriction_lb * estG * cos(estAngle(i)), ...
                      estG * sin(estAngle(i)) - estFriction_ub * estG * cos(estAngle(i))];
-        estAcc_lb = min(estAccSet);
-        estAcc_ub = max(estAccSet);
+            estAcc_lb = min(estAccSet);
+            estAcc_ub = max(estAccSet);
+            
+        end
+        
         
         validationSet(i) = estWeight(i) * estG * cos(estAngle(i));
 
-        u_lb = estAcc_lb /k_ub;
-        u_ub = estAcc_ub /k_lb;
+%         u_lb = min(-[estAcc_lb /k_ub, estAcc_ub /k_lb]);
+%         u_ub = max(-[estAcc_lb /k_ub, estAcc_ub /k_lb]);
+        
+        uSet = -[(k_ub*Q*estAcc_ub)/(k_ub^2*Q+R), ...
+                 (k_lb*Q*estAcc_ub)/(k_lb^2*Q+R), ...
+                 (k_ub*Q*estAcc_lb)/(k_ub^2*Q+R), ...
+                 (k_lb*Q*estAcc_lb)/(k_lb^2*Q+R)];
+
+        u_lb = min(uSet);    
+        u_ub = max(uSet);
 
         u(i) = min([validationSet(i), u_ub]);
 
