@@ -13,7 +13,7 @@ close all;
 % Prepare for "Live Script" representation, here the redundency design is just
 % used for easy modification
 optimizationType = [false, false, false, false, false, false, false];
-optimizationType(5) = true;
+optimizationType(2) = true;
 
 % additional config for case 7
 type7Type = [false, false, false, false];
@@ -164,6 +164,9 @@ disp('Estimations: ');
 overapproxFactor = 0.05;
 overapproximation = 1 + overapproxFactor; % ?% redandency 
 
+% use X sigma principle to estimate the range of a normal distribution
+Xsigma = 6;
+
 % estimated base acceleration
 estAcc_ub = maxAcc;
 estAcc_lb = min(ddot_x_out);
@@ -205,13 +208,13 @@ end
 
 % estimated weight (accurate: [0.0249, 0.0251] kg)
 if weightSensor == true
-    estWeight_lb = weight_mean - weight_std;
-    estWeight_ub = weight_mean + weight_std;
+    estWeight_lb = weight_mean - Xsigma * weight_std;
+    estWeight_ub = weight_mean + Xsigma * weight_std;
     estWeight = weight;
     disp(['(SENSORED) The estimated weight: [', num2str(estWeight_lb), ', ', num2str(estWeight_ub), '] kg.']);
 else
-    estWeight_lb = (weight_mean - weight_std) * (1 - overapproxFactor);
-    estWeight_ub = (weight_mean + weight_std) * overapproximation;
+    estWeight_lb = (weight_mean - Xsigma * weight_std) * (1 - overapproxFactor);
+    estWeight_ub = (weight_mean + Xsigma * weight_std) * overapproximation;
     disp(['The estimated weight: [', num2str(estWeight_lb), ', ', num2str(estWeight_ub), '] kg.']);
 end
 
