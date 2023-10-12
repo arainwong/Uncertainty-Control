@@ -116,7 +116,7 @@ numPlot = numPlot + 1;
 maxVelocity = max(max(dot_x));
 % minVelocityIndex = find(dot_x(end, :)>0);
 % minVelocity = min(dot_x(end, minVelocityIndex));
-minVelocity = min(min(dot_x));
+minVelocity = min(dot_x(end, :));
 % acceleration
 maxAcc = max(ddot_x_out);
 % minAccIndex = find(ddot_x(end, :)>0);
