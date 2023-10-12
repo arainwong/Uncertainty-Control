@@ -28,16 +28,18 @@ ddot_x = zeros(step, numSample);
 
 %% Check how many sample failed
 % definition of "fail": can not 
-numFailed = sum(x(end, :)<length);
+numFailed = sum(dot_x(end, :)<length);
+disp('----------------------------------------------------------------------');
 if numFailed > 0
     disp(['ATTENTION: ', num2str(numFailed), '/', num2str(numSample), ...
         ' samples are failed.']);
     disp('The possible reason could be excessive friction or a longer required time.');
-    disp('----------------------------------------------------------------------');
+    
 else
     disp(['All ', num2str(numSample), ' samples succeed.']);
-    disp('----------------------------------------------------------------------');
+    
 end
+disp('----------------------------------------------------------------------');
 
 %% Fix the relation between distance and velocity
 
@@ -48,7 +50,7 @@ endTime = zeros(1, numSample);
 % fix the data -> consider the phsical limit
 for i = 1:numSample
     % find the index when the workpiece reached the end
-    temp = find(x_out(:, i)>=length, 1 );
+    temp = find(x_out(:, i)>=length, 1);
     ddot_x(:, i) = ddot_x_out(i);
     if temp ~= 0 
         indexForFinalVelocity(i) = temp;
@@ -65,47 +67,61 @@ for i = 1:numSample
 end
 
 %% Visualization
-nbins = 20;
+nbins = 50;
+plotRow = 3;
+plotCol = 2;
+numPlot = 1;
 
-subplot(3,2,1)
+subplot(plotRow,plotCol,numPlot)
 plot(t(1:max(indexForFinalVelocity)), x(1:max(indexForFinalVelocity),:));
 title('distance x');
 xlabel('t'); ylabel('x');
+numPlot = numPlot + 1;
 
-subplot(3,2,2)
+subplot(plotRow,plotCol,numPlot)
 scatter(endTime, dot_x(max(indexForFinalVelocity), :));
 title('velocity v');
 xlabel('t'); ylabel('v');
+numPlot = numPlot + 1;
 
 
-subplot(3,2,3)
+subplot(plotRow,plotCol,numPlot)
 plot(t(1:max(indexForFinalVelocity)), dot_x(1:max(indexForFinalVelocity),:));
 title('velocity v');
 xlabel('t'); ylabel('v');
+numPlot = numPlot + 1;
 
-subplot(3,2,4)
-histogram(removeZero(ddot_x(max(indexForFinalVelocity),:)), nbins);
+subplot(plotRow,plotCol,numPlot)
+histogram(removeZero(dot_x(max(indexForFinalVelocity),:)), nbins);
 title('velocity v');
 xlabel('v'); ylabel('the number of samples');
+numPlot = numPlot + 1;
 
-subplot(3,2,5)
-plot(t(1:max(indexForFinalVelocity)), ddot_x(1:max(indexForFinalVelocity),:));
-title('acceleration a');
-xlabel('t'); ylabel('a');
+subplot(plotRow,plotCol,numPlot)
+% plot(t(1:max(indexForFinalVelocity)), ddot_x(1:max(indexForFinalVelocity),:));
+% title('acceleration a');
+% xlabel('t'); ylabel('a');
+histogram(endTime, nbins);
+title('the number of samples reached the end in certain time scale');
+xlabel('t'); ylabel('the number of samples');
+numPlot = numPlot + 1;
 
-subplot(3,2,6)
+subplot(plotRow,plotCol,numPlot)
 histogram(removeZero(ddot_x(max(indexForFinalVelocity),:)), nbins);
 title('acceleration a');
-xlabel('a'); ylabel('number of samples');
+xlabel('a'); ylabel('the number of samples');
+numPlot = numPlot + 1;
 
 % velocity
 maxVelocity = max(max(dot_x));
-minVelocityIndex = find(dot_x(end, :)>0);
-minVelocity = min(dot_x(end, minVelocityIndex));
+% minVelocityIndex = find(dot_x(end, :)>0);
+% minVelocity = min(dot_x(end, minVelocityIndex));
+minVelocity = min(min(dot_x));
 % acceleration
 maxAcc = max(ddot_x_out);
-minAccIndex = find(ddot_x(end, :)>0);
-minAcc = min(ddot_x(end, minVelocityIndex));
+% minAccIndex = find(ddot_x(end, :)>0);
+% minAcc = min(ddot_x(end, minVelocityIndex));
+minAcc = min(ddot_x_out);
 
 % min/max value analysis
 disp(['In the ', num2str(numSample - numFailed), ' successful samples: '])
@@ -118,7 +134,7 @@ disp(['             the slowest takes ', ...
 
 % acceleration
 disp(['The acceleration range of the samples is : [', ...
-    num2str(minAcc), ', ', num2str(maxAcc), '] m/s.']);
+    num2str(minAcc), ', ', num2str(maxAcc), '] m/s^2.']);
 disp('----------------------------------------------------------------------');
 
  
