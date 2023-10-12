@@ -13,9 +13,11 @@ close all;
 % Prepare for "Live Script" representation, here the redundency design is just
 % used for easy modification
 optimizationType = [false, false, false, false, false, false, false];
-optimizationType(7) = true;
+optimizationType(5) = true;
+
+% additional config for case 7
 type7Type = [false, false, false, false];
-type7Type(2) = true;
+type7Type(3) = true;
 
 disp('----------------------------------------------------------------------');
 % config the sensors
@@ -66,7 +68,7 @@ elseif find(optimizationType==true) == 5
     % require any estimation and constraint
     t_des = 0.5; % s
     dot_x_des = length/t_des;
-    PID = [10, 1, 1];
+    PID = [3, 1, 0];
     disp(['The reference velocity is ', num2str(dot_x_des), ' m/s.']);
     disp('----------------------------------------------------------------------');
     return
@@ -186,13 +188,17 @@ end
 
 % estimated friction (accurate: [0.4, 0.6])
 if frictionSensor == true
-    estFriction_lb = friction_mean - friction_std;
-    estFriction_ub = friction_mean + friction_std;
+%     estFriction_lb = friction_mean - friction_std;
+%     estFriction_ub = friction_mean + friction_std;
+    estFriction_lb = friction_lb;
+    estFriction_ub = friction_ub;
     estFriction = friction;
     disp(['(SENSORED) The estimated friction: [', num2str(estFriction_lb), ', ', num2str(estFriction_ub), '].']);
 else
-    estFriction_lb = (friction_mean - friction_std) * (1 - overapproxFactor);
-    estFriction_ub = (friction_mean + friction_std) * overapproximation;
+%     estFriction_lb = (friction_mean - friction_std) * (1 - overapproxFactor);
+%     estFriction_ub = (friction_mean + friction_std) * overapproximation;
+    estFriction_lb = friction_lb * (1 - overapproxFactor);
+    estFriction_ub = friction_ub * overapproximation;
     disp(['The estimated friction: [', num2str(estFriction_lb), ', ', num2str(estFriction_ub), '].']);
 
 end
