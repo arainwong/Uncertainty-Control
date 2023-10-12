@@ -85,6 +85,7 @@ numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
 plot(t(1:max(indexForFinalVelocity)), dot_x_fb(1:max(indexForFinalVelocity),:));
+% plot(t(1:max(indexForFinalVelocity)), dot_x_out(1:max(indexForFinalVelocity),:));
 title('velocity v');
 xlabel('t'); ylabel('v');
 numPlot = numPlot + 1;
@@ -112,13 +113,15 @@ xlabel('a'); ylabel('the number of samples');
 numPlot = numPlot + 1;
 
 % velocity
-maxVelocity = max(max(dot_x_fb));
-minVelocityIndex = find(dot_x_fb(end, :)>0);
-minVelocity = min(dot_x_fb(end, minVelocityIndex));
-% acceleration
+maxVelocity = max(max(dot_x));
+% minVelocityIndex = find(dot_x(end, :)>0);
+% minVelocity = min(dot_x(end, minVelocityIndex));
+minVelocity = min(min(dot_x));
+% acceleration in this case does not make sense
 maxAcc = max(ddot_x_out);
-minAccIndex = find(ddot_x(end, :)>0);
-minAcc = min(ddot_x(end, minVelocityIndex));
+% % minAccIndex = find(ddot_x(end, :)>0);
+% % minAcc = min(ddot_x(end, minVelocityIndex));
+% minAcc = min(ddot_x_out);
 
 % min/max value analysis
 disp(['In the ', num2str(numSample - numFailed), ' successful samples: '])
@@ -130,8 +133,8 @@ disp(['             the slowest takes ', ...
     num2str(t(max(indexForFinalVelocity))), 's to reach the end.']);
 
 % acceleration
-disp(['The acceleration range of the samples is : [', ...
-    num2str(minAcc), ', ', num2str(maxAcc), '] m/s.']);
+% disp(['The acceleration range of the samples is : [', ...
+%     num2str(minAcc), ', ', num2str(maxAcc), '] m/s.']);
 disp('----------------------------------------------------------------------');
 
  
