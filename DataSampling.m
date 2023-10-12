@@ -2,7 +2,7 @@ clc; clear;
 
 %% Baseline, without constraints and control input
 % Data generation
-numSample = 1000;
+numSample = 500;
 
 length = 230/1000; %(m)
 
@@ -23,12 +23,24 @@ gDist = makedist('Uniform','lower',g_lb,'upper',g_ub); %m/s^2
 g = random(gDist, 1, 1);
 % g = random(gDist, 1, numSample);
 
-friction_mean = 0.5;
-friction_std = 0.1;
-frictionNormalDist = makedist('Normal','mu',friction_mean,'sigma',friction_std);
-friction = random(frictionNormalDist, 1, numSample);
+% friction_mean = 0.5;
+% friction_std = 0.1;
+% frictionNormalDist = makedist('Normal','mu',friction_mean,'sigma',friction_std);
+% friction = random(frictionNormalDist, 1, numSample);
+friction_lb = 0.4;
+friction_ub = 0.6;
+frictionUniformDist = makedist('Uniform','lower',friction_lb,'upper',friction_ub);
+friction = random(frictionUniformDist, 1, numSample);
+
+
+baselineSet = [g * (sin(angle_ub) - friction_ub * cos(angle_ub)), ...
+               g * (sin(angle_lb) - friction_ub * cos(angle_lb)), ...
+               g * (sin(angle_ub) - friction_lb * cos(angle_ub)), ...
+               g * (sin(angle_lb) - friction_lb * cos(angle_lb))];
+baseline_lb = min(baselineSet);
+baseline_ub = max(baselineSet);
 
 %% Control and optimization
 u = 0;
 
-
+ 
