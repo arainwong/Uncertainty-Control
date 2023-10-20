@@ -13,11 +13,13 @@ close all;
 % Prepare for "Live Script" representation, here the redundency design is just
 % used for easy modification
 optimizationType = [false, false, false, false, false, false, false];
-optimizationType(2) = true;
+optimizationType(3) = true;
 
 % additional config for case 7
-type7Type = [false, false, false, false];
-type7Type(3) = true;
+if find(optimizationType==true) == 7
+    type7Type = [false, false, false, false];
+    type7Type(3) = true;
+end
 
 disp('----------------------------------------------------------------------');
 % config the sensors
@@ -75,7 +77,7 @@ elseif find(optimizationType==true) == 5
 
 elseif find(optimizationType==true) == 6
     disp('Case 6, feedforward and feedback control.');
-    PID = [3, 0.5, 0];
+    PID = [3, 1, 0];
     u_ref = u;
     dot_x_ref = dot_x(end, :);
     disp('The reference of control sequence and velocity have been set.');
@@ -127,8 +129,8 @@ disp('----------------------------------------------------------------------');
 disp('Constraints: ');
 
 % length = 0.23
-time_lb = 0.2; % s
-time_ub = 0.3; % s
+time_lb = 0.5; % s
+time_ub = 0.5; % s
 
 % velocity and time constraints mode
 vtMode = false;
@@ -241,7 +243,7 @@ if find(optimizationType==true) == 1
 
     u = u_ub;
 
-    disp(['The control input set: [', num2str(u_lb), ', ', num2str(u_ub), ...
+    disp(['The control input set: [', num2str(u), ', ', num2str(u), ...
         '] m*kg/s^2.']);
     
     % validation: how much workpieces being blown away
@@ -279,19 +281,21 @@ elseif find(optimizationType==true) == 3
     end
     u = zeros(1, numSample);
     validationSet = zeros(1, numSample);
+    estAcc_lb = zeros(1, numSample);
+    estAcc_ub = zeros(1, numSample);
     for i = 1:numSample
         k_lb = estFriction_lb / estWeight(i);
         k_ub = estFriction_ub / estWeight(i);
         
         estAccSet = [estG * sin(estAngle(i)) - estFriction_lb * estG * cos(estAngle(i)), ...
                      estG * sin(estAngle(i)) - estFriction_ub * estG * cos(estAngle(i))];
-        estAcc_lb = min(estAccSet);
-        estAcc_ub = max(estAccSet);
+        estAcc_lb(i) = max([0, min(estAccSet)]);
+        estAcc_ub(i) = max(estAccSet);
         
         validationSet(i) = estWeight(i) * estG * cos(estAngle(i));
 
-        u_lb = (con_lb - estAcc_ub) /k_ub;
-        u_ub = (con_ub - estAcc_lb) /k_lb;
+        u_lb = (con_lb - estAcc_ub(i)) /k_ub;
+        u_ub = (con_ub - estAcc_lb(i)) /k_lb;
 
         u(i) = min([validationSet(i), u_ub]);
 
