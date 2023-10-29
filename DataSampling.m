@@ -2,7 +2,8 @@ clc; clear;
 
 %% Baseline, without constraints and control input
 % Data generation
-numSample = 500;
+numSample = 5000;
+stopTime = 5;
 
 length = 230/1000; %(m)
 
@@ -29,6 +30,8 @@ g = random(gDist, 1, 1);
 % friction = random(frictionNormalDist, 1, numSample);
 friction_lb = 0.4;
 friction_ub = 0.6;
+% friction_lb = 0.49;
+% friction_ub = 0.51;
 frictionUniformDist = makedist('Uniform','lower',friction_lb,'upper',friction_ub);
 friction = random(frictionUniformDist, 1, numSample);
 
@@ -40,7 +43,16 @@ baselineSet = [g * (sin(angle_ub) - friction_ub * cos(angle_ub)), ...
 baseline_lb = min(baselineSet);
 baseline_ub = max(baselineSet);
 
+% print the theoretical acceleration range
+if baseline_lb<=0
+    baseline_lb_fixed = 0;
+else
+    baseline_lb_fixed = baseline_lb;
+end
+disp(['Theoretically, the acceleration range of samples is [', num2str(baseline_lb), ', ', ...
+        num2str(baseline_ub), '] -> [', num2str(baseline_lb_fixed), ', ', num2str(baseline_ub), '].']);
+disp('----------------------------------------------------------------------');
+
 %% Control and optimization
 u = 0;
 
- 
