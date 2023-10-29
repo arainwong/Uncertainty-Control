@@ -76,12 +76,14 @@ subplot(plotRow,plotCol,numPlot)
 plot(t(1:max(indexForFinalVelocity)), x(1:max(indexForFinalVelocity),:));
 title('distance x');
 xlabel('t'); ylabel('x');
+axis([0 stopTime 0 length]);
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
 scatter(endTime, dot_x(max(indexForFinalVelocity), :));
 title('velocity v');
 xlabel('t'); ylabel('v');
+axis([0 stopTime -inf inf]);
 numPlot = numPlot + 1;
 
 
@@ -89,6 +91,7 @@ subplot(plotRow,plotCol,numPlot)
 plot(t(1:max(indexForFinalVelocity)), dot_x(1:max(indexForFinalVelocity),:));
 title('velocity v');
 xlabel('t'); ylabel('v');
+axis([0 stopTime -inf inf]);
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
@@ -104,6 +107,7 @@ subplot(plotRow,plotCol,numPlot)
 histogram(endTime, nbins);
 title('the number of samples reached the end in certain time scale');
 xlabel('t'); ylabel('the number of samples');
+axis([0 stopTime -inf inf]);
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
