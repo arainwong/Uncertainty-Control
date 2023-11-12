@@ -38,3 +38,11 @@ in `DataEstimationAndConstraints.m`.
     - DataEstimationAndConstraints.m    -> set the case to "6"
     - FFFBmodel.slx                     -> run model
     - FBDataAnalysis.m                  -> refine and visulize data 
+
+- Case 7 (minimum energy consumption)
+    - DataSampling.m                    -> config parameters 
+    - model.slx                         -> run the model 
+    - DataAnalysis.m                    -> refine and visulize data 
+    - DataEstimationAndConstraints.m    -> set to `optimizationType(7) = True` and choose `type7Type(?) = True`, derive control input
+    - model.slx                         -> rerun the model
+    - DataAnalysis.m                    -> refine and visulize data 
