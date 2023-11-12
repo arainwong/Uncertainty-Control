@@ -66,14 +66,14 @@ for i = 1:numSample
 end
 
 %% Visualization
-nbins = 20;
+nbins = 50;
 plotRow = 3;
 plotCol = 2;
 numPlot = 1;
 
 subplot(plotRow,plotCol,numPlot)
-plot(t(1:max(indexForFinalVelocity)), x(1:max(indexForFinalVelocity),:));
-title('distance x');
+plot(t(1:max(indexForFinalVelocity)), x_out(1:max(indexForFinalVelocity),:));
+title('distance flow');
 xlabel('t'); ylabel('x');
 numPlot = numPlot + 1;
 
@@ -84,22 +84,22 @@ xlabel('t'); ylabel('u');
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
-plot(t(1:max(indexForFinalVelocity)), dot_x_fb(1:max(indexForFinalVelocity),:));
+plot(t(1:max(indexForFinalVelocity)), dot_x_out(1:max(indexForFinalVelocity),:));
 % plot(t(1:max(indexForFinalVelocity)), dot_x_out(1:max(indexForFinalVelocity),:));
-title('velocity v');
+title('velocity flow');
 xlabel('t'); ylabel('v');
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
 histogram(removeZero(dot_x_fb(max(indexForFinalVelocity),:)), nbins);
-title('velocity v');
+title('velocity distribution');
 xlabel('v'); ylabel('the number of samples');
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
 % plot(t(1:max(indexForFinalVelocity)), ddot_x(1:max(indexForFinalVelocity),:));
 plot(t(1:max(indexForFinalVelocity)), ddot_x_out(1:max(indexForFinalVelocity),:));
-title('acceleration a');
+title('acceleration flow');
 xlabel('t'); ylabel('a');
 % histogram(endTime, nbins);
 % title('the number of samples reached the end in certain time scale');
@@ -108,15 +108,15 @@ numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
 histogram(removeZero(ddot_x(max(indexForFinalVelocity),:)), nbins);
-title('acceleration a');
+title('acceleration distribution');
 xlabel('a'); ylabel('the number of samples');
 numPlot = numPlot + 1;
 
 % velocity
-maxVelocity = max(max(dot_x));
+maxVelocity = max(max(dot_x_fb));
 % minVelocityIndex = find(dot_x(end, :)>0);
 % minVelocity = min(dot_x(end, minVelocityIndex));
-minVelocity = min(min(dot_x));
+minVelocity = min(min(dot_x_fb));
 % acceleration in this case does not make sense
 maxAcc = max(ddot_x_out);
 % % minAccIndex = find(ddot_x(end, :)>0);
