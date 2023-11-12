@@ -74,30 +74,30 @@ numPlot = 1;
 
 subplot(plotRow,plotCol,numPlot)
 plot(t(1:max(indexForFinalVelocity)), x(1:max(indexForFinalVelocity),:));
-title('distance x');
+title('distance flow');
 xlabel('t'); ylabel('x');
-axis([0 stopTime 0 length]);
+axis([0 1.5 0 length]);
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
 scatter(endTime, dot_x(max(indexForFinalVelocity), :));
-title('velocity v');
+title('end velocity');
 xlabel('t'); ylabel('v');
-axis([0 stopTime -inf inf]);
+axis([0 1.5 0 inf]);
 numPlot = numPlot + 1;
 
 
 subplot(plotRow,plotCol,numPlot)
 plot(t(1:max(indexForFinalVelocity)), dot_x(1:max(indexForFinalVelocity),:));
-title('velocity v');
+title('velocity flow');
 xlabel('t'); ylabel('v');
-axis([0 stopTime -inf inf]);
+axis([0 1.5 -inf inf]);
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
 histogram(removeZero(dot_x(max(indexForFinalVelocity),:)), nbins);
-title('velocity v');
-xlabel('v'); ylabel('the number of samples');
+title('velocity distribution');
+xlabel('v'); ylabel('sample count');
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
@@ -105,15 +105,15 @@ subplot(plotRow,plotCol,numPlot)
 % title('acceleration a');
 % xlabel('t'); ylabel('a');
 histogram(endTime, nbins);
-title('the number of samples reached the end in certain time scale');
-xlabel('t'); ylabel('the number of samples');
-axis([0 stopTime -inf inf]);
+title('end time distribution');
+xlabel('t'); ylabel('sample count');
+% axis([0 stopTime -inf inf]);
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
 histogram(removeZero(ddot_x(max(indexForFinalVelocity),:)), nbins);
-title('acceleration a');
-xlabel('a'); ylabel('the number of samples');
+title('acceleration distribution');
+xlabel('a'); ylabel('sample count');
 numPlot = numPlot + 1;
 
 % velocity
