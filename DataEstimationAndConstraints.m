@@ -13,7 +13,7 @@ close all;
 % Prepare for "Live Script" representation, here the redundency design is just
 % used for easy modification
 optimizationType = [false, false, false, false, false, false, false];
-optimizationType(3) = true;
+optimizationType(6) = true;
 
 % additional config for case 7
 if find(optimizationType==true) == 7
