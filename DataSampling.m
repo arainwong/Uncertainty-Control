@@ -28,10 +28,11 @@ g = random(gDist, 1, 1);
 % friction_std = 0.1;
 % frictionNormalDist = makedist('Normal','mu',friction_mean,'sigma',friction_std);
 % friction = random(frictionNormalDist, 1, numSample);
-friction_lb = 0.4;
-friction_ub = 0.6;
-% friction_lb = 0.49;
-% friction_ub = 0.51;
+
+% friction_lb = 0.4;
+% friction_ub = 0.6;
+friction_lb = 0.49;
+friction_ub = 0.51;
 frictionUniformDist = makedist('Uniform','lower',friction_lb,'upper',friction_ub);
 friction = random(frictionUniformDist, 1, numSample);
 

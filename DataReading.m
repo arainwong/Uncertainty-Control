@@ -1,7 +1,8 @@
 clc; clear;
 
 %% config the number of samples
-numSample = 500;
+% numSample in the range of [0,5000]
+numSample = 1000;
 stopTime = 5;
 
 %% load fixed data
