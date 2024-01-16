@@ -71,19 +71,22 @@ nbins = 50;
 plotRow = 3;
 plotCol = 2;
 numPlot = 1;
+coordX = 0.6;
 
 subplot(plotRow,plotCol,numPlot)
 plot(t(1:max(indexForFinalVelocity)), x(1:max(indexForFinalVelocity),:));
 title('distance flow');
 xlabel('t'); ylabel('x');
-axis([0 1.5 0 length]);
+axis([0 coordX -inf inf]);
+% axis([0 5 -inf inf]);
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
 scatter(endTime, dot_x(max(indexForFinalVelocity), :));
 title('end velocity');
 xlabel('t'); ylabel('v');
-axis([0 1.5 0 inf]);
+axis([0.2 coordX -inf inf]);
+% axis([0 5 -inf inf]);
 numPlot = numPlot + 1;
 
 
@@ -91,7 +94,8 @@ subplot(plotRow,plotCol,numPlot)
 plot(t(1:max(indexForFinalVelocity)), dot_x(1:max(indexForFinalVelocity),:));
 title('velocity flow');
 xlabel('t'); ylabel('v');
-axis([0 1.5 -inf inf]);
+axis([0 coordX -inf inf]);
+% axis([0 5 -inf inf]);
 numPlot = numPlot + 1;
 
 subplot(plotRow,plotCol,numPlot)
