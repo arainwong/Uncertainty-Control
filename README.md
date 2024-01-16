@@ -2,20 +2,28 @@
 Semester Thesis
 
 ## Introduction
-- Case 0, baseline
-- Case 1, require no sensor, only based on the estimation of accleration of baseline case
-- Case 2, require weight sensor, g sensor used as default
-- Case 3, require angle and weight sensors, g sensor used as default
-- Case 4, require angle, weight and friction sensors, g sensor used as default
-- Case 5, have its own control goal based on reference parameter
-- Case 6, case 2 + case 3 == Feedforward + Feedback
+
+### >Case I<
+- 1 -> Scenario 1, require no sensor
+- 2 -> Scenario 2, require weight sensor, g sensor used as default
+- 3 -> Scenario 3, require angle and weight sensors, g sensor used as default
+- 4 -> Scenario 4, require angle, weight and friction sensors, g sensor used as default
+
+### >Case II<
+- 5 -> Case II (FB), Feedback control, have its own control goal based on reference parameter
+
+### >Case III<
+- 6 -> Case III (FF + FB), Feedforward + Feedback
+
+### >Case IV< | additional setting, e.g. Case I Scenario 3 Configuration
+- 7 -> Case IV, Minimum energy consumption strategy
 
 ## How to use the project?
 - If one want to change the control type after used some cases, just simply set `u=0` 
 and rerun the `model.slx` and `DataAnalysis.m` script, after that rechoose the control type 
 in `DataEstimationAndConstraints.m`.
 
-- Case 1, 2, 3, 4
+- 1, 2, 3, 4
     - DataSampling.m                    -> config parameters 
     - model.slx                         -> run the model
     - DataAnalysis.m                    -> refine and visulize data 
@@ -23,13 +31,13 @@ in `DataEstimationAndConstraints.m`.
     - model.slx                         -> rerun the model
     - DataAnalysis.m                    -> refine and visulize data 
 
-- Case 5 (feedback form control)
+- 5 (Feedback form control)
     - DataSampling.m                    -> config parameters 
     - DataEstimationAndConstraints.m    -> set reference parameter
     - FBmodel.slx                       -> run the model
     - FBDataAnalysis.m                  -> refine and visulize data 
 
-- Case 6 (synthesed feedforward and feedback form control)
+- 6 (Synthesed feedforward and feedback form control)
     - DataSampling.m                    -> config parameters 
     - model.slx                         -> run the model to get neccessary acceleration estiomation which used in feedforward control
     - DataAnalysis.m                    -> refine and visulize data 
@@ -39,7 +47,7 @@ in `DataEstimationAndConstraints.m`.
     - FFFBmodel.slx                     -> run model
     - FBDataAnalysis.m                  -> refine and visulize data 
 
-- Case 7 (minimum energy consumption)
+- 7 (Minimum energy consumption)
     - DataSampling.m                    -> config parameters 
     - model.slx                         -> run the model 
     - DataAnalysis.m                    -> refine and visulize data 
