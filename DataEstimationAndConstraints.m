@@ -1,21 +1,27 @@
 close all;
 
 %% Optimization Type
+% >Case I<
+% 1 -> Scenario 1, require no sensor
+% 2 -> Scenario 2, require weight sensor, g sensor used as default
+% 3 -> Scenario 3, require angle and weight sensors, g sensor used as default
+% 4 -> Scenario 4, require angle, weight and friction sensors, g sensor used as default
 
-% 1 -> Case 1, require no sensor
-% 2 -> Case 2, require weight sensor, g sensor used as default
-% 3 -> Case 3, require angle and weight sensors, g sensor used as default
-% 4 -> Case 4, require angle, weight and friction sensors, g sensor used as default
-% 5 -> Case 5, feedback control, have its own control goal based on reference parameter
-% 6 -> Case 6, case 2 + case 3 == Feedforward + Feedback
-% 7 -> Case 7, minimum energy consumption strategy
+% >Case II<
+% 5 -> Case II (FB), Feedback control, have its own control goal based on reference parameter
+
+% >Case III<
+% 6 -> Case III (FF + FB), Feedforward + Feedback
+
+% >Case IV< | additional setting, e.g. Case I Scenario 3 Configuration
+% 7 -> Case IV, Minimum energy consumption strategy
 
 % Prepare for "Live Script" representation, here the redundency design is just
 % used for easy modification
 optimizationType = [false, false, false, false, false, false, false];
 optimizationType(6) = true;
 
-% additional config for case 7
+% Additional config for case 7
 if find(optimizationType==true) == 7
     type7Type = [false, false, false, false];
     type7Type(3) = true;
